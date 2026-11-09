@@ -26,8 +26,11 @@ This installs Docker when it is missing, the `ammonode-daemon` binary in `/usr/l
 On the node's page in the panel click **Show configure command**. It looks like this:
 
 ```bash
-ammonode-daemon configure --panel https://panel.example.com --uuid … --token-id … --token … --port 8080 --sftp-port 2022
+ammonode-daemon configure --panel https://panel.example.com --uuid … --token-id … --token … --port 8080 --sftp-port 2022 \
+  --ssl-cert /etc/letsencrypt/live/node1.example.com/fullchain.pem --ssl-key /etc/letsencrypt/live/node1.example.com/privkey.pem
 ```
+
+The `--ssl-*` options are only added when the node's **Connection** is HTTPS and **Behind proxy** is off.
 
 Run it on the node, then:
 
@@ -56,7 +59,11 @@ api:
     key: /etc/letsencrypt/live/node1.example.com/privkey.pem
 ```
 
-and set **Connection** to HTTPS on the node in the panel. Restart with `systemctl restart ammonode-daemon`.
+and set **Connection** to HTTPS on the node in the panel. Restart with `systemctl restart ammonode-daemon`. When the node is set to HTTPS before you configure it, the configure command already includes these paths.
+
+### Behind a proxy
+
+If a proxy in front of the daemon handles TLS (for example Cloudflare, or nginx on the same port of another machine), set **Connection** to HTTPS and turn on **Behind proxy**. The configure command then leaves TLS off in the daemon, and the proxy forwards HTTPS traffic for the daemon port to it as plain HTTP. Browsers still connect with `https://` and `wss://`.
 
 ## Firewall
 
